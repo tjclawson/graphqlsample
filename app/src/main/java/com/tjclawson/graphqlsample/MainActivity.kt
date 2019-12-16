@@ -19,6 +19,10 @@ class MainActivity : AppCompatActivity() {
             getAllPosts()
         }
 
+        button_create_post.setOnClickListener {
+            createNewPost(et_title.text.toString(), et_description.text.toString(), et_image_url.text.toString())
+        }
+
     }
 
     private fun getAllPosts() {
@@ -31,9 +35,23 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(response: Response<GetAllPostsQuery.Data>) {
-                Log.i("BIGBRAIN", response.data().toString())
+                Log.i("BIGBRAIN", "QUERY: " + response.data().toString())
             }
-
         })
+    }
+
+    private fun createNewPost(mTitle: String, mDescription: String, mImageUrl: String) {
+        val createNewPostMutation: CreateNewPostMutation = CreateNewPostMutation(mTitle, mDescription, mImageUrl)
+
+        ApolloProvider().getApolloClient().mutate(createNewPostMutation)
+            .enqueue(object: ApolloCall.Callback<CreateNewPostMutation.Data>() {
+                override fun onFailure(e: ApolloException) {
+                    Log.i("BIGBRAIN", e.message.toString())
+                }
+
+                override fun onResponse(response: Response<CreateNewPostMutation.Data>) {
+                    Log.i("BIGBRAIN", "MUTATE: " + response.data().toString())
+                }
+            })
     }
 }
